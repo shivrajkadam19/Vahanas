@@ -4,7 +4,7 @@ import { TextInput, Menu, Divider } from 'react-native-paper';
 import tw from 'twrnc';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-const App = () => {
+const RegisterScreen = ({navigation}) => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -117,7 +117,7 @@ const App = () => {
         {/* Sign Up Button */}
         <TouchableOpacity
           style={tw`mt-6 py-3 bg-purple-600 rounded-full items-center`}
-          onPress={() => { }}
+          onPress={() => navigation.navigate('Main')}
         >
           <Text style={tw`text-white text-lg font-semibold`}>Sign Up</Text>
         </TouchableOpacity>
@@ -125,7 +125,7 @@ const App = () => {
         {/* Footer Section */}
         <View style={tw`flex-row justify-center mt-6`}>
           <Text style={tw`text-gray-500`}>Don't have an account? </Text>
-          <TouchableOpacity onPress={() => { }}>
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
             <Text style={tw`text-purple-600 font-semibold`}>Log In</Text>
           </TouchableOpacity>
         </View>
@@ -134,4 +134,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default RegisterScreen;

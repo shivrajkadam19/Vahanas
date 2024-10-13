@@ -12,19 +12,19 @@ const slides = [
     key: 'slide1',
     title: 'Welcome to the App',
     text: 'This is the first step of the onboarding process.',
-    animation: require('./src/assets/animation1.json'),
+    animation: require('../assets/animation1.json'),
   },
   {
     key: 'slide2',
     title: 'Stay Connected',
     text: 'Stay connected with your friends and family.',
-    animation: require('./src/assets/animation2.json'),
+    animation: require('../assets/animation2.json'),
   },
   {
     key: 'slide3',
     title: 'Explore More',
     text: 'Discover more features and content.',
-    animation: require('./src/assets/Animation3.json'),
+    animation: require('../assets/Animation3.json'),
   },
 ];
 

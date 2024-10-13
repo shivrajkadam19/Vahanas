@@ -1,45 +1,40 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import tw from 'twrnc'; // Importing twrnc for Tailwind styling
 import HomeScreen from '../screen/HomeScreen';
+import SettingScreen from '../screen/SettingScreen';
+import CustomTabBar from '../components/CustomTabBar';
+import CustomAppBar from '../components/CustomAppBar';
+import { View } from 'react-native';
 
 const Tab = createBottomTabNavigator();
 
-const MainNavigator = ({ navigation }) => {
+const ScreenWithAppBar = ({ component: Component, title, navigation }) => {
     return (
-        <>
-            <Tab.Navigator
-                screenOptions={({ route }) => ({
-                    tabBarIcon: ({ focused }) => {
-                        let iconName;
-
-                        if (route.name === 'Home') {
-                            iconName = focused ? 'home' : 'home';
-                        } else if (route.name === 'Profile') {
-                            iconName = focused ? 'person' : 'person-outline';
-                        }
-
-                        return (
-                            <Icon 
-                                name={iconName} 
-                                size={28} 
-                                color={focused ? 'green' : 'gray'} 
-                                style={tw`p-1`} // Adding some padding for better appearance
-                            />
-                        );
-                    },
-                    tabBarShowLabel: false,
-                    tabBarStyle: tw`bg-white shadow-md p-2`, // Tailwind for background and shadow
-                    tabBarActiveTintColor: 'green', // Active icon color
-                    tabBarInactiveTintColor: 'gray', // Inactive icon color
-                    tabBarHideOnKeyboard: true, // Automatically hides tab bar when keyboard is open
-                })}
-            >
-                <Tab.Screen name="Home" component={HomeScreen} />
-            </Tab.Navigator>
-        </>
+        <View style={{ flex: 1 }}>
+            <CustomAppBar title={title} navigation={navigation} />
+            <Component />
+        </View>
     );
-}
+};
+
+const MainNavigator = () => {
+    return (
+        <Tab.Navigator
+            screenOptions={{
+                headerShown: false,
+                tabBarStyle:{
+                    backgroundColor:'white'
+                },
+            }}
+            tabBar={(props) => <CustomTabBar {...props} />}>
+            <Tab.Screen name="Home">
+                {props => <ScreenWithAppBar {...props} component={HomeScreen} title="Home" />}
+            </Tab.Screen>
+            <Tab.Screen name="Profile">
+                {props => <ScreenWithAppBar {...props} component={SettingScreen} title="Profile" />}
+            </Tab.Screen>
+        </Tab.Navigator>
+    );
+};
 
 export default MainNavigator;

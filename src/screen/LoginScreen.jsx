@@ -4,7 +4,7 @@ import { TextInput, Switch } from 'react-native-paper';
 import tw from 'twrnc';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-const App = () => {
+const LoginScreen = ({navigation}) => {
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -80,7 +80,7 @@ const App = () => {
         {/* Log In Button */}
         <TouchableOpacity
           style={tw`py-3 bg-purple-600 rounded-full items-center`}
-          onPress={() => {}}
+          onPress={() => navigation.navigate('Main')}
         >
           <Text style={tw`text-white text-lg font-semibold`}>Log In</Text>
         </TouchableOpacity>
@@ -88,7 +88,7 @@ const App = () => {
         {/* Sign Up Section */}
         <View style={tw`flex-row justify-center mt-6`}>
           <Text style={tw`text-gray-500`}>Don't have an account? </Text>
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity onPress={() => navigation.navigate('Register')}>
             <Text style={tw`text-purple-600 font-semibold`}>Sign Up</Text>
           </TouchableOpacity>
         </View>
@@ -97,4 +97,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default LoginScreen;
