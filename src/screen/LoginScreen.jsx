@@ -32,7 +32,7 @@ const LoginScreen = ({navigation}) => {
       </View>
 
       {/* Form Section */}
-      <View style={tw`bg-white p-6 -mt-6 rounded-t-3xl shadow-lg rounded-b-3xl`}>
+      <View style={tw`bg-white p-6 -mt-6 rounded-t-3xl rounded-b-3xl`}>
         {/* Email/Phone Input */}
         <TextInput
           label="Email / Phone Number"
