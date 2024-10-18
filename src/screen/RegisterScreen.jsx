@@ -138,7 +138,10 @@ const RegisterScreen = ({ navigation }) => {
               <Text>Other</Text>
             </View>
           </RadioButton.Group>
-          <TouchableOpacity style={tw`mt-4 py-3 bg-purple-600 rounded-full items-center`} onPress={() => bottomSheetRef.current?.close()}>
+          <TouchableOpacity
+            style={tw`mt-4 py-3 bg-purple-600 rounded-full items-center`}
+            onPress={() => bottomSheetRef.current?.close()}
+          >
             <Text style={tw`text-white text-lg font-semibold`}>Done</Text>
           </TouchableOpacity>
         </View>

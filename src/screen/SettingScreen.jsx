@@ -20,7 +20,7 @@ const SettingScreen = () => {
 
   // State for profile image
   const [profileImage, setProfileImage] = useState('https://cdn3.pixelcut.app/1/3/profile_picture_1728ecf2bd.jpg');
-  const [isImageViewVisible, setImageViewVisible] = useState(false); // To view the image in full screen
+  const [isImageViewVisible, setImageViewVisible] = useState(false);
 
   // Reference for the BottomSheet
   const bottomSheetRef = useRef(null);
