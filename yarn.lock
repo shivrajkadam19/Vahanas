@@ -4811,10 +4811,10 @@ react-native-image-viewing@^0.2.2:
   resolved "https://registry.npmjs.org/react-native-image-viewing/-/react-native-image-viewing-0.2.2.tgz"
   integrity sha512-osWieG+p/d2NPbAyonOMubttajtYEYiRGQaJA54slFxZ69j1V4/dCmcrVQry47ktVKy8/qpFwCpW1eT6MH5T2Q==
 
-react-native-maps@^1.18.1:
-  version "1.18.1"
-  resolved "https://registry.npmjs.org/react-native-maps/-/react-native-maps-1.18.1.tgz"
-  integrity sha512-53ypvAMgj0okYZetlf+QjRBVBrImOiVYsb8I3DyUl/kEqDvO/PLlhZ2pu5tgL+r0EfOxjgx9kPWcoVnpniukaA==
+react-native-maps@^1.18.2:
+  version "1.18.2"
+  resolved "https://registry.npmjs.org/react-native-maps/-/react-native-maps-1.18.2.tgz"
+  integrity sha512-HWkYIfasEGmnYmfBVbAYVVScOeZbIe+tI19pI/3oQ9GkY0px7hvCimjzuh0Y6GTFn8WHYk8qK5fmkmOKTpLy5A==
   dependencies:
     "@types/geojson" "^7946.0.13"
 

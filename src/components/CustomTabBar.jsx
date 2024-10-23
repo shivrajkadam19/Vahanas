@@ -1,7 +1,6 @@
 // CustomTabBar.js
-
 import React from 'react';
-import { View, TouchableOpacity, Text, Dimensions } from 'react-native';
+import { View, TouchableOpacity, Text, Dimensions, Platform } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import * as Animatable from 'react-native-animatable'; // For animations
 
@@ -12,16 +11,18 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
     <View
       style={{
         flexDirection: 'row',
-        backgroundColor: 'white',
-        height: 80,
+        backgroundColor: '#9333EA',
+        height: 70,
         justifyContent: 'space-around',
-        alignItems: 'center',
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
+        alignItems: 'center',
+        paddingBottom: Platform.OS === 'ios' ? 20 : 10,
         position: 'absolute',
         bottom: 0,
         width: width,
-      }}>
+      }}
+    >
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         const label =
@@ -33,13 +34,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 
         const isFocused = state.index === index;
 
-        const iconNames = [
-          'newspaper',
-          'file-alt',
-          'calendar-alt',
-          'smile',
-          'user',
-        ];
+        const iconNames = ['home', 'user-cog']; // Customize icons based on index
         const iconName = iconNames[index];
 
         const onPress = () => {
@@ -70,25 +65,36 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
             testID={options.tabBarTestID}
             onPress={onPress}
             onLongPress={onLongPress}
-            style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+          >
             <Animatable.View
-              animation={isFocused ? 'bounceIn' : undefined}
-              duration={800}
+              animation={isFocused ? 'pulse' : undefined} // Pulse effect for active tabs
+              duration={500}
+              easing="ease-out"
               style={{
                 justifyContent: 'center',
                 alignItems: 'center',
-                width: isFocused ? 60 : 50,
-                height: isFocused ? 60 : 50,
-                borderRadius: 30,
-                backgroundColor: isFocused ? '#E0E7FF' : 'transparent',
-              }}>
+                width: isFocused ? 70 : 50, // Adjust icon size when focused
+                height: isFocused ? 70 : 50,
+                borderRadius: isFocused ? 35 : 25, // Circle border when focused
+                backgroundColor: isFocused ? 'white' : 'transparent', // Reversed color on focus
+                borderWidth: isFocused ? 4 : 0, // Border around active icon
+                borderColor: '#9333EA', // Same color as the tab bar
+                marginBottom: isFocused ? 30 : 5, // Smooth margin adjustment
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 3.84,
+                elevation: 5, // Elevation for shadow (Android)
+              }}
+            >
               <FontAwesome5
                 name={iconName}
                 size={isFocused ? 30 : 24}
-                color={isFocused ? '#4F46E5' : '#6B7280'}
+                color={isFocused ? '#9333EA' : '#EDE9FE'} // Purple icon for active tab
               />
               {isFocused && (
-                <Text style={{ fontSize: 12, color: '#4F46E5', marginTop: 5 }}>
+                <Text style={{ fontSize: 12, color: '#9333EA', marginTop: 5 }}>
                   {label}
                 </Text>
               )}

@@ -5,7 +5,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'; // Vector ico
 
 const CustomAppBar = ({ navigation, title }) => {
   return (
-    <View style={tw`bg-black z-10 p-6 justify-center flex-row items-center absolute w-full rounded-b-10 h-20`}>
+    <View style={tw`bg-purple-600 z-10 p-6 justify-center flex-row items-center absolute w-full rounded-b-10 h-20`}>
       {/* <TouchableOpacity onPress={() => navigation.goBack()}>
         <FontAwesome5 name="arrow-left" size={24} color="white" />
       </TouchableOpacity> */}
