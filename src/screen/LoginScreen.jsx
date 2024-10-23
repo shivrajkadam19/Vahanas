@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { TextInput, Switch } from 'react-native-paper';
 import tw from 'twrnc';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
-const LoginScreen = ({navigation}) => {
+const LoginScreen = ({ navigation }) => {
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -17,7 +18,7 @@ const LoginScreen = ({navigation}) => {
       {/* Header Section */}
       <View style={tw`bg-white h-24 p-6`}>
         <View style={tw`flex-row items-center`}>
-          <TouchableOpacity onPress={() => {}} style={tw`mr-4`}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={tw`mr-4`}>
             <FontAwesome name="arrow-left" size={24} color="black" />
           </TouchableOpacity>
           <Text style={tw`text-black text-xl font-semibold`}>Log In</Text>
@@ -27,7 +28,7 @@ const LoginScreen = ({navigation}) => {
       {/* Lower Purple Section */}
       <View style={tw`bg-purple-600 h-36 p-6 rounded-t-3xl -mt-6`}>
         <Text style={tw`text-white text-center mt-4 text-lg`}>
-          Login to your account to access all the features in Barber Shop
+          Login to your account to access all the features in Bus Tracker
         </Text>
       </View>
 
@@ -39,9 +40,9 @@ const LoginScreen = ({navigation}) => {
           value={emailOrPhone}
           onChangeText={setEmailOrPhone}
           mode="outlined"
-          style={tw`mb-4`}
           placeholder="Enter Email / Phone Number"
-          theme={{ colors: { primary: '#6200EE', underlineColor: 'transparent' } }}
+          style={tw`mb-4`}
+          theme={{ colors: { primary: '#6200EE' } }}
         />
 
         {/* Password Input */}
@@ -51,15 +52,21 @@ const LoginScreen = ({navigation}) => {
           onChangeText={setPassword}
           mode="outlined"
           secureTextEntry={!showPassword}
-          style={tw`mb-2`}
           placeholder="Enter Password"
           right={
             <TextInput.Icon
-              name={showPassword ? 'eye-off' : 'eye'}
-              onPress={togglePasswordVisibility}
+              icon={() => (
+                <MaterialIcon
+                  name={showPassword ? 'visibility-off' : 'visibility'}
+                  size={24}
+                  color="black"
+                  onPress={togglePasswordVisibility}
+                />
+              )}
             />
           }
-          theme={{ colors: { primary: '#6200EE', underlineColor: 'transparent' } }}
+          style={tw`mb-2`}
+          theme={{ colors: { primary: '#6200EE' } }}
         />
 
         {/* Save Me and Forgot Password Section */}
@@ -72,7 +79,7 @@ const LoginScreen = ({navigation}) => {
             />
             <Text style={tw`ml-2 text-gray-700`}>Save Me</Text>
           </View>
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity>
             <Text style={tw`text-purple-600`}>Forgot Password?</Text>
           </TouchableOpacity>
         </View>

@@ -1,10 +1,12 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import {
+  View, Text, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform,
+} from 'react-native';
 import tw from 'twrnc';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import CustomBottomSheet from '../components/CustomBottomSheet'; // Import the bottom sheet component
-import { RadioButton } from 'react-native-paper'; // Ensure you're using a basic radio button
+import CustomBottomSheet from '../components/CustomBottomSheet';
+import { TextInput, RadioButton } from 'react-native-paper';
 
 const RegisterScreen = ({ navigation }) => {
   const [fullName, setFullName] = useState('');
@@ -23,7 +25,6 @@ const RegisterScreen = ({ navigation }) => {
       style={tw`flex-1`}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-
       <View style={tw`flex-1 bg-white`}>
         {/* Header Section */}
         <View style={tw`bg-white h-24 p-6`}>
@@ -34,63 +35,75 @@ const RegisterScreen = ({ navigation }) => {
             <Text style={tw`text-black text-xl font-semibold`}>Sign Up</Text>
           </View>
         </View>
-        <ScrollView contentContainerStyle={tw`flex-grow`} keyboardShouldPersistTaps="handled">
-          {/* Lower Purple Section */}
-          <View style={tw`bg-purple-600 h-36 p-6 rounded-t-3xl -mt-6`}>
-            <Text style={tw`text-white text-center mt-4 text-lg`}>
-              Sign Up to access all the features in Barber Shop
-            </Text>
-          </View>
 
-          {/* Form Section with Rounded Corners */}
-          <View style={tw`bg-white p-6 mt-[-20] rounded-t-3xl rounded-b-3xl`}>
+        {/* Lower Purple Section */}
+        <View style={tw`bg-purple-600 h-36 p-6 rounded-t-3xl -mt-6`}>
+          <Text style={tw`text-white text-center mt-4 text-lg`}>
+            Sign Up to access all the features in Barber Shop
+          </Text>
+        </View>
+
+        {/* Form Section */}
+        <View style={tw`bg-white p-6 -mt-6 rounded-t-3xl rounded-b-3xl`}>
+          <ScrollView contentContainerStyle={tw`flex-grow`} keyboardShouldPersistTaps="handled">
             {/* Full Name Input */}
-            <Text style={tw`text-lg text-gray-600 mb-2`}>Full Name</Text>
             <TextInput
+              label="Full Name"
               value={fullName}
               onChangeText={setFullName}
+              mode="outlined"
               placeholder="Enter Full Name"
-              style={tw`border border-gray-300 p-4 rounded-lg mb-4`}
-              placeholderTextColor="#999"
+              style={tw`mb-4`}
+              theme={{ colors: { primary: '#6200EE' } }}
             />
 
             {/* Email Input */}
-            <Text style={tw`text-lg text-gray-600 mb-2`}>Email</Text>
             <TextInput
+              label="Email"
               value={email}
               onChangeText={setEmail}
+              mode="outlined"
               placeholder="Enter Email"
               keyboardType="email-address"
-              style={tw`border border-gray-300 p-4 rounded-lg mb-4`}
-              placeholderTextColor="#999"
+              style={tw`mb-4`}
+              theme={{ colors: { primary: '#6200EE' } }}
             />
 
             {/* Phone Number Input */}
-            <Text style={tw`text-lg text-gray-600 mb-2`}>Phone Number</Text>
             <TextInput
+              label="Phone Number"
               value={phoneNumber}
               onChangeText={setPhoneNumber}
+              mode="outlined"
               placeholder="Enter Phone Number"
               keyboardType="phone-pad"
-              style={tw`border border-gray-300 p-4 rounded-lg mb-4`}
-              placeholderTextColor="#999"
+              style={tw`mb-4`}
+              theme={{ colors: { primary: '#6200EE' } }}
             />
 
             {/* Password Input */}
-            <Text style={tw`text-lg text-gray-600 mb-2`}>Password</Text>
-            <View style={tw`flex-row items-center border border-gray-300 px-4 py-2 rounded-lg mb-4`}>
-              <TextInput
-                value={password}
-                onChangeText={setPassword}
-                placeholder="Enter Password"
-                secureTextEntry={!showPassword}
-                style={tw`flex-1`}
-                placeholderTextColor="#999"
-              />
-              <TouchableOpacity onPress={togglePasswordVisibility}>
-                <MaterialIcon name={showPassword ? 'visibility' : 'visibility-off'} size={20} color="#999" />
-              </TouchableOpacity>
-            </View>
+            <TextInput
+              label="Password"
+              value={password}
+              onChangeText={setPassword}
+              mode="outlined"
+              secureTextEntry={!showPassword}
+              placeholder="Enter Password"
+              right={
+                <TextInput.Icon
+                  icon={() => (
+                    <MaterialIcon
+                      name={showPassword ? 'visibility-off' : 'visibility'}
+                      size={24}
+                      color="black"
+                      onPress={togglePasswordVisibility}
+                    />
+                  )}
+                />
+              }
+              style={tw`mb-4`}
+              theme={{ colors: { primary: '#6200EE' } }}
+            />
 
             {/* Gender Selection */}
             <TouchableOpacity
@@ -103,50 +116,64 @@ const RegisterScreen = ({ navigation }) => {
             {/* Sign Up Button */}
             <TouchableOpacity
               style={tw`mt-6 py-3 bg-purple-600 rounded-full items-center`}
-              onPress={() => navigation.navigate('Main')}
+              onPress={() => navigation.navigate('OtpScreen')}
             >
-              <Text style={tw`text-white text-lg font-semibold`}>Sign Up</Text>
+              <Text style={tw`text-white text-lg font-semibold`}>Send OTP</Text>
             </TouchableOpacity>
 
             {/* Footer Section */}
             <View style={tw`flex-row justify-center mt-6`}>
-              <Text style={tw`text-gray-500`}>Don't have an account? </Text>
+              <Text style={tw`text-gray-500`}>Already have an account? </Text>
               <TouchableOpacity onPress={() => navigation.navigate('Login')}>
                 <Text style={tw`text-purple-600 font-semibold`}>Log In</Text>
               </TouchableOpacity>
             </View>
-          </View>
-        </ScrollView>
+          </ScrollView>
+        </View>
       </View>
 
-
       {/* Custom Bottom Sheet for Gender Selection */}
-      <CustomBottomSheet ref={bottomSheetRef} snapPoints={['40%']}>
-        <View style={tw`p-4`}>
-          <Text style={tw`text-lg font-semibold mb-4`}>Select Gender</Text>
+      <CustomBottomSheet ref={bottomSheetRef} snapPoints={['45%']}>
+        <View style={tw`p-6 bg-white rounded-t-3xl`}>
+          <Text style={tw`text-lg font-semibold mb-4 text-center text-gray-800`}>
+            Select Gender
+          </Text>
+
           <RadioButton.Group onValueChange={value => setGender(value)} value={gender}>
-            <View style={tw`flex-row items-center mb-2`}>
+            <TouchableOpacity
+              style={tw`flex-row items-center justify-between py-3 px-4 border-b border-gray-200`}
+              onPress={() => setGender('Male')}
+            >
+              <Text style={tw`text-gray-700 text-lg`}>Male</Text>
               <RadioButton value="Male" />
-              <Text>Male</Text>
-            </View>
-            <View style={tw`flex-row items-center mb-2`}>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={tw`flex-row items-center justify-between py-3 px-4 border-b border-gray-200`}
+              onPress={() => setGender('Female')}
+            >
+              <Text style={tw`text-gray-700 text-lg`}>Female</Text>
               <RadioButton value="Female" />
-              <Text>Female</Text>
-            </View>
-            <View style={tw`flex-row items-center mb-2`}>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={tw`flex-row items-center justify-between py-3 px-4`}
+              onPress={() => setGender('Other')}
+            >
+              <Text style={tw`text-gray-700 text-lg`}>Other</Text>
               <RadioButton value="Other" />
-              <Text>Other</Text>
-            </View>
+            </TouchableOpacity>
           </RadioButton.Group>
+
           <TouchableOpacity
-            style={tw`mt-4 py-3 bg-purple-600 rounded-full items-center`}
+            style={tw`mt-6 py-3 bg-purple-600 rounded-full items-center`}
             onPress={() => bottomSheetRef.current?.close()}
           >
             <Text style={tw`text-white text-lg font-semibold`}>Done</Text>
           </TouchableOpacity>
         </View>
       </CustomBottomSheet>
-    </KeyboardAvoidingView >
+    </KeyboardAvoidingView>
   );
 };
 
