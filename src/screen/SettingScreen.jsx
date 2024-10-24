@@ -1,5 +1,17 @@
 import React, { useRef, useState } from 'react';
-import { View, Text, Image, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native';
 import tw from 'twrnc'; // Tailwind styling
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'; // Icon for Edit button
 import ImageCropPicker from 'react-native-image-crop-picker'; // For image picker
@@ -49,6 +61,7 @@ const SettingScreen = () => {
     }
   };
 
+
   // Handle bottom sheet option select
   const handleBottomSheetOption = (option) => {
     if (option === 'view') {
@@ -59,20 +72,29 @@ const SettingScreen = () => {
     bottomSheetRef.current?.close(); // Close the bottom sheet after selecting an option
   };
 
+  const dismissKeyboard = () => {
+    Keyboard.dismiss(); // Hide keyboard when tapping outside
+  };
+  
   return (
-    <View style={tw`flex-1 bg-white mt-10`}>
-      {/* Profile Header */}
-      <View style={tw`bg-yellow-400 rounded-b-10 pt-16 pb-5 items-center relative`}>
-        {/* Profile Picture */}
-        <TouchableOpacity onPress={() => bottomSheetRef.current?.open()}>
-          <Image
-            source={{ uri: profileImage }}
-            style={tw`w-30 h-30 rounded-full border-4 border-white`}
-          />
-        </TouchableOpacity>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      style={tw`flex-1`}
+    >
+      <TouchableWithoutFeedback onPress={dismissKeyboard}>
+        <View style={tw`flex-1 bg-white mt-10`}>
+          {/* Profile Header */}
+          <View style={tw`bg-yellow-400 rounded-b-10 pt-16 pb-5 items-center relative`}>
+            {/* Profile Picture */}
+            <TouchableOpacity onPress={() => bottomSheetRef.current?.open()}>
+              <Image
+                source={{ uri: profileImage }}
+                style={tw`w-30 h-30 rounded-full border-4 border-white`}
+              />
+            </TouchableOpacity>
 
 
-        {/* <View style={tw`absolute right-33 top-35`}>
+            {/* <View style={tw`absolute right-33 top-35`}>
           <TouchableOpacity onPress={handleEditPress} style={tw`bg-white p-2 rounded-full border`}>
             <MaterialIcons name={"add"} size={20} color="black" />
           </TouchableOpacity>
@@ -80,116 +102,118 @@ const SettingScreen = () => {
 
 
 
-        {/* Edit Profile Image Button */}
-        <View style={tw`absolute right-10 top-16`}>
-          {
-            isEditing ?
-              <TouchableOpacity onPress={handleEditPress} style={tw`bg-black p-2 rounded-full`}>
-                <MaterialIcons name={"save"} size={20} color="white" />
-              </TouchableOpacity> :
-              <TouchableOpacity onPress={handleEditPress} style={tw`bg-black p-2 rounded-full`}>
-                <MaterialIcons name={"edit"} size={20} color="white" />
+            {/* Edit Profile Image Button */}
+            <View style={tw`absolute right-10 top-16`}>
+              {
+                isEditing ?
+                  <TouchableOpacity onPress={handleEditPress} style={tw`bg-black p-2 rounded-full`}>
+                    <MaterialIcons name={"save"} size={20} color="white" />
+                  </TouchableOpacity> :
+                  <TouchableOpacity onPress={handleEditPress} style={tw`bg-black p-2 rounded-full`}>
+                    <MaterialIcons name={"edit"} size={20} color="white" />
+                  </TouchableOpacity>
+              }
+
+            </View>
+
+            {/* Fullscreen Image Viewer */}
+            <ImageView
+              images={[{ uri: profileImage }]}
+              imageIndex={0}
+              visible={isImageViewVisible}
+              onRequestClose={() => setImageViewVisible(false)}
+            />
+
+            {/* Name */}
+            <Text style={tw`text-black text-xl mt-4`}>Rutuja Ghongade</Text>
+          </View>
+
+          {/* Editable User Information */}
+          <ScrollView style={tw`flex-1 bg-white mb-15`}>
+            <View style={tw`p-6`}>
+              {/* UserName */}
+              <View style={tw`mb-4`}>
+                <Text style={tw`text-black text-lg font-bold`}>Username</Text>
+                <TextInput
+                  style={tw`border-b border-gray-300 py-2 text-lg`}
+                  editable={isEditing}
+                  value={userName}
+                  onChangeText={setUserName}
+                />
+              </View>
+
+              {/* Email */}
+              <View style={tw`mb-4`}>
+                <Text style={tw`text-black text-lg font-bold`}>Email</Text>
+                <TextInput
+                  style={tw`border-b border-gray-300 py-2 text-lg`}
+                  editable={isEditing}
+                  value={email}
+                  onChangeText={setEmail}
+                />
+              </View>
+
+              {/* Phone Number */}
+              <View style={tw`mb-4`}>
+                <Text style={tw`text-black text-lg font-bold`}>Phone Number</Text>
+                <TextInput
+                  style={tw`border-b border-gray-300 py-2 text-lg`}
+                  editable={isEditing}
+                  value={phoneNo}
+                  onChangeText={setPhoneNo}
+                />
+              </View>
+
+              {/* Enroll Number */}
+              <View style={tw`mb-4`}>
+                <Text style={tw`text-black text-lg font-bold`}>Enroll Number</Text>
+                <TextInput
+                  style={tw`border-b border-gray-300 py-2 text-lg`}
+                  editable={isEditing}
+                  value={enrollNo}
+                  onChangeText={setEnrollNo}
+                />
+              </View>
+
+              {/* Branch */}
+              <View style={tw`mb-4`}>
+                <Text style={tw`text-black text-lg font-bold`}>Branch</Text>
+                <TextInput
+                  style={tw`border-b border-gray-300 py-2 text-lg`}
+                  editable={isEditing}
+                  value={branch}
+                  onChangeText={setBranch}
+                />
+              </View>
+
+              {/* Year */}
+              <View style={tw`mb-4`}>
+                <Text style={tw`text-black text-lg font-bold`}>Year</Text>
+                <TextInput
+                  style={tw`border-b border-gray-300 py-2 text-lg`}
+                  editable={isEditing}
+                  value={year}
+                  onChangeText={setYear}
+                />
+              </View>
+            </View>
+          </ScrollView>
+
+          {/* Custom Bottom Sheet */}
+          <CustomBottomSheet ref={bottomSheetRef} snapPoints={['50%']}>
+            <View style={tw`z-10`}>
+              <Text style={tw`text-lg font-bold text-gray-800 mb-4 text-center`}>Profile Options</Text>
+              <TouchableOpacity onPress={() => handleBottomSheetOption('view')} style={tw`mb-4 p-4 bg-gray-200 rounded-lg`}>
+                <Text style={tw`text-center`}>View Profile</Text>
               </TouchableOpacity>
-          }
-
+              <TouchableOpacity onPress={() => handleBottomSheetOption('edit')} style={tw`p-4 bg-gray-200 rounded-lg`}>
+                <Text style={tw`text-center`}>Edit Profile</Text>
+              </TouchableOpacity>
+            </View>
+          </CustomBottomSheet>
         </View>
-
-        {/* Fullscreen Image Viewer */}
-        <ImageView
-          images={[{ uri: profileImage }]}
-          imageIndex={0}
-          visible={isImageViewVisible}
-          onRequestClose={() => setImageViewVisible(false)}
-        />
-
-        {/* Name */}
-        <Text style={tw`text-black text-xl mt-4`}>Rutuja Ghongade</Text>
-      </View>
-
-      {/* Editable User Information */}
-      <ScrollView style={tw`flex-1 bg-white mb-15`}>
-        <View style={tw`p-6`}>
-          {/* UserName */}
-          <View style={tw`mb-4`}>
-            <Text style={tw`text-black text-lg font-bold`}>Username</Text>
-            <TextInput
-              style={tw`border-b border-gray-300 py-2 text-lg`}
-              editable={isEditing}
-              value={userName}
-              onChangeText={setUserName}
-            />
-          </View>
-
-          {/* Email */}
-          <View style={tw`mb-4`}>
-            <Text style={tw`text-black text-lg font-bold`}>Email</Text>
-            <TextInput
-              style={tw`border-b border-gray-300 py-2 text-lg`}
-              editable={isEditing}
-              value={email}
-              onChangeText={setEmail}
-            />
-          </View>
-
-          {/* Phone Number */}
-          <View style={tw`mb-4`}>
-            <Text style={tw`text-black text-lg font-bold`}>Phone Number</Text>
-            <TextInput
-              style={tw`border-b border-gray-300 py-2 text-lg`}
-              editable={isEditing}
-              value={phoneNo}
-              onChangeText={setPhoneNo}
-            />
-          </View>
-
-          {/* Enroll Number */}
-          <View style={tw`mb-4`}>
-            <Text style={tw`text-black text-lg font-bold`}>Enroll Number</Text>
-            <TextInput
-              style={tw`border-b border-gray-300 py-2 text-lg`}
-              editable={isEditing}
-              value={enrollNo}
-              onChangeText={setEnrollNo}
-            />
-          </View>
-
-          {/* Branch */}
-          <View style={tw`mb-4`}>
-            <Text style={tw`text-black text-lg font-bold`}>Branch</Text>
-            <TextInput
-              style={tw`border-b border-gray-300 py-2 text-lg`}
-              editable={isEditing}
-              value={branch}
-              onChangeText={setBranch}
-            />
-          </View>
-
-          {/* Year */}
-          <View style={tw`mb-4`}>
-            <Text style={tw`text-black text-lg font-bold`}>Year</Text>
-            <TextInput
-              style={tw`border-b border-gray-300 py-2 text-lg`}
-              editable={isEditing}
-              value={year}
-              onChangeText={setYear}
-            />
-          </View>
-        </View>
-      </ScrollView>
-
-      {/* Custom Bottom Sheet */}
-      <CustomBottomSheet ref={bottomSheetRef} snapPoints={['50%']}>
-        <View style={tw`z-10`}>
-          <Text style={tw`text-lg font-bold text-gray-800 mb-4 text-center`}>Profile Options</Text>
-          <TouchableOpacity onPress={() => handleBottomSheetOption('view')} style={tw`mb-4 p-4 bg-gray-200 rounded-lg`}>
-            <Text style={tw`text-center`}>View Profile</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleBottomSheetOption('edit')} style={tw`p-4 bg-gray-200 rounded-lg`}>
-            <Text style={tw`text-center`}>Edit Profile</Text>
-          </TouchableOpacity>
-        </View>
-      </CustomBottomSheet>
-    </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView >
   );
 };
 

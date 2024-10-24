@@ -1,15 +1,65 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { TextInput, Switch } from 'react-native-paper';
 import tw from 'twrnc';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser, clearError } from '../redux/authSlice';  
+import * as Keychain from 'react-native-keychain';  // Import Keychain for secure storage
 
 const LoginScreen = ({ navigation }) => {
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [saveMe, setSaveMe] = useState(false);
+
+  const dispatch = useDispatch();
+  const { user, error, loading } = useSelector((state) => state.auth);
+
+  // Handle login
+  const handleLogin = async () => {
+    console.log('Attempting login with:', { emailOrPhone, password });
+    if (!emailOrPhone || !password) {
+      Alert.alert('Validation Error', 'Both fields are required.');
+      return;
+    }
+
+    const response = await dispatch(loginUser({ email: emailOrPhone, password }));
+    if (response.meta.requestStatus === 'fulfilled' && saveMe) {
+      // Store credentials securely if Save Me is enabled
+      await Keychain.setGenericPassword(emailOrPhone, password);
+    }
+  };
+
+  // Fetch saved credentials on mount (if available)
+  useEffect(() => {
+    const loadCredentials = async () => {
+      try {
+        const credentials = await Keychain.getGenericPassword();
+        if (credentials) {
+          setEmailOrPhone(credentials.username);
+          setPassword(credentials.password);
+          setSaveMe(true);
+        }
+      } catch (e) {
+        console.error('Failed to load credentials:', e);
+      }
+    };
+    loadCredentials();
+  }, []);
+
+  // Handle user login success or error
+  useEffect(() => {
+    if (user) {
+      console.log('Login successful:', user);
+      navigation.navigate('Main');
+    }
+    if (error) {
+      console.error('Login failed:', error);
+      Alert.alert('Login Error', error, [{ text: 'OK', onPress: () => dispatch(clearError()) }]);
+    }
+  }, [user, error]);
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
@@ -34,7 +84,6 @@ const LoginScreen = ({ navigation }) => {
 
       {/* Form Section */}
       <View style={tw`bg-white p-6 -mt-6 rounded-t-3xl rounded-b-3xl`}>
-        {/* Email/Phone Input */}
         <TextInput
           label="Email / Phone Number"
           value={emailOrPhone}
@@ -45,7 +94,6 @@ const LoginScreen = ({ navigation }) => {
           theme={{ colors: { primary: '#6200EE' } }}
         />
 
-        {/* Password Input */}
         <TextInput
           label="Password"
           value={password}
@@ -69,7 +117,6 @@ const LoginScreen = ({ navigation }) => {
           theme={{ colors: { primary: '#6200EE' } }}
         />
 
-        {/* Save Me and Forgot Password Section */}
         <View style={tw`flex-row justify-between items-center mb-6`}>
           <View style={tw`flex-row items-center`}>
             <Switch
@@ -84,15 +131,18 @@ const LoginScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        {/* Log In Button */}
         <TouchableOpacity
           style={tw`py-3 bg-purple-600 rounded-full items-center`}
-          onPress={() => navigation.navigate('Main')}
+          onPress={handleLogin}
+          disabled={loading}
         >
-          <Text style={tw`text-white text-lg font-semibold`}>Log In</Text>
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text style={tw`text-white text-lg font-semibold`}>Log In</Text>
+          )}
         </TouchableOpacity>
 
-        {/* Sign Up Section */}
         <View style={tw`flex-row justify-center mt-6`}>
           <Text style={tw`text-gray-500`}>Don't have an account? </Text>
           <TouchableOpacity onPress={() => navigation.navigate('Register')}>

@@ -35,7 +35,7 @@ const App = ({ navigation }) => {
       <View style={tw`bg-purple-600 h-48 p-6`}>
         <View style={tw`flex-row items-center justify-center`}>
           <Text style={tw`text-white text-xl font-semibold`}>
-            {item.title}
+            {/* {item.title} */}
           </Text>
         </View>
       </View>

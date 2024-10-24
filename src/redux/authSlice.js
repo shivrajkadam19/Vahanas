@@ -1,135 +1,178 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { base_api, login_api, register_api, send_otp } from './api';
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Keychain from 'react-native-keychain';
 
+// API Endpoints
+const SEND_OTP_API = 'https://vb-7o1p.onrender.com/api/v1/auth/sendotp';
+const LOGIN_API = 'https://vb-7o1p.onrender.com/api/v1/auth/login';
+const SIGNUP_API = 'https://vb-7o1p.onrender.com/api/v1/auth/signup';
+const PROFILE_API = 'https://vb-7o1p.onrender.com/api/v1/auth/profile';
+
+// Initial State
 const initialState = {
   user: null,
   loading: false,
   error: null,
 };
 
-// Helper functions to store, retrieve, and remove user from AsyncStorage
-const storeUserData = async (user) => {
+// Helper: Store token in Keychain
+const storeToken = async (token) => {
+  if (!token) {
+    console.error('Token is null or undefined. Skipping Keychain storage.');
+    return;
+  }
+
   try {
-    await AsyncStorage.setItem('user', JSON.stringify(user));
+    await Keychain.setGenericPassword('auth', token, {
+      accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED,
+    });
+    console.log('Token stored successfully in Keychain.');
   } catch (e) {
-    console.error('Failed to save user to AsyncStorage', e);
+    console.error('Failed to store token in Keychain:', e);
   }
 };
 
-const getUserData = async () => {
+// Helper: Retrieve token from Keychain
+const getToken = async () => {
   try {
-    const userData = await AsyncStorage.getItem('user');
-    return userData ? JSON.parse(userData) : null;
+    const credentials = await Keychain.getGenericPassword();
+    return credentials ? credentials.password : null;
   } catch (e) {
-    console.error('Failed to fetch user from AsyncStorage', e);
+    console.error('Failed to retrieve token from Keychain:', e);
     return null;
   }
 };
 
-const removeUserData = async () => {
+// Helper: Remove token from Keychain
+const removeToken = async () => {
   try {
-    await AsyncStorage.removeItem('user');
+    await Keychain.resetGenericPassword();
+    console.log('Token removed from Keychain.');
   } catch (e) {
-    console.error('Failed to remove user from AsyncStorage', e);
+    console.error('Failed to remove token from Keychain:', e);
   }
 };
 
-// Fetch user from AsyncStorage or Redux state
-export const fetchUser = createAsyncThunk(
-  'auth/fetchUser',
-  async (_, { getState, rejectWithValue }) => {
-    const { user } = getState().auth;
-    if (user) {
-      return user;  // If user exists in state, return it
+// AsyncThunk: Send OTP
+export const sendOtp = createAsyncThunk(
+  'auth/sendOtp',
+  async ({ email, phoneNumber }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(SEND_OTP_API, { email, phoneNumber });
+      console.log('OTP sent successfully:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error sending OTP:', error.response?.data || error.message);
+      return rejectWithValue(
+        error.response?.data?.message || 'Failed to send OTP.'
+      );
     }
-    const storedUser = await getUserData();
-    if (storedUser) {
-      return storedUser;  // If user exists in AsyncStorage, return it
-    }
-    // return rejectWithValue('No user found');
-  },
+  }
 );
 
+// AsyncThunk: Register User
 export const registerUser = createAsyncThunk(
   'auth/registerUser',
   async ({ formData, otp }, { rejectWithValue }) => {
-    const { userName, email, phoneNo, password } = formData;
     try {
-      const response = await axios.post(
-        `${register_api}`,
-        {
-          userName,
-          email,
-          password,
-          phoneNo,
-          otp,
-        },
+      const registrationData = { ...formData, otp };
+      const response = await axios.post(SIGNUP_API, registrationData);
+
+      const { token, user } = response.data;
+      await storeToken(token);  // Store token securely
+      return user;
+    } catch (error) {
+      console.error('Registration Error:', error.response?.data || error.message);
+      return rejectWithValue(
+        error.response?.data?.message || 'Registration failed.'
       );
-      await storeUserData(response.data.user);  // Store user in AsyncStorage
-      return response.data.user;
-    } catch (err) {
-      console.log(err.response.data.message)
-      return rejectWithValue(err.response.data.message);
     }
-  },
+  }
 );
 
-// Send OTP action
-export const sendOtp = createAsyncThunk(
-  'auth/sendOtp',
-  async ({ email }, { rejectWithValue }) => {
-    try {
-      const response = await axios.post(
-        `${send_otp}`,
-        { email },
-      );
-      return response.data;  // No need to store this in state, only for UI feedback
-    } catch (err) {
-      // console.log(err.response.data.message)
-      return rejectWithValue(err.response.data.message);
-    }
-  },
-);
-
+// AsyncThunk: Login User
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${login_api}`, { email, password });
-      await storeUserData(response.data.user);  // Store user in AsyncStorage
-      return response.data.user;
-    } catch (err) {
-      return rejectWithValue(err.response.data.message);
+      const response = await axios.post(LOGIN_API, { email, password });
+      const { token, user } = response.data;
+
+      if (!token) {
+        console.error('Received null/undefined token.');
+        throw new Error('Login failed. Please try again.');
+      }
+
+      await storeToken(token); // Store token securely
+      return user;
+    } catch (error) {
+      console.error('Login Error:', error.response?.data || error.message);
+      return rejectWithValue(error.response?.data?.message || 'Login failed.');
     }
-  },
+  }
 );
 
+// AsyncThunk: Fetch Logged-in User Profile
+export const fetchUser = createAsyncThunk(
+  'auth/fetchUser',
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = await getToken(); // Retrieve token from Keychain
+
+      if (!token) throw new Error('User not logged in.');
+
+      const response = await axios.get(PROFILE_API, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // console.log('User profile fetched:', response.data.user);
+      return response.data.user;
+    } catch (error) {
+      console.error('Fetch User Error:', error.response?.data || error.message);
+      return rejectWithValue(
+        error.response?.data?.message || 'Failed to fetch user profile.'
+      );
+    }
+  }
+);
+
+// AsyncThunk: Logout User
+export const logoutUser = createAsyncThunk('auth/logoutUser', async () => {
+  await removeToken(); // Clear token from Keychain
+  return null;
+});
+
+// Optional: Function to handle token refresh (to be implemented later)
+const refreshToken = async () => {
+  console.warn('Token refresh functionality is not implemented yet.');
+};
+
+// Create Auth Slice
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    logout: (state) => {
-      state.user = null;
-      removeUserData();  // Clear user from AsyncStorage
-    },
     clearError: (state) => {
-      state.error = null; // Reset error
+      state.error = null;
+    },
+    setUser: (state, action) => {
+      state.user = action.payload;
     },
   },
   extraReducers: (builder) => {
     builder
-      // Fetch User
-      .addCase(fetchUser.pending, (state) => {
+      // Send OTP
+      .addCase(sendOtp.pending, (state) => {
+        console.log('sendOtp.pending'); // Add logging
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchUser.fulfilled, (state, action) => {
+      .addCase(sendOtp.fulfilled, (state) => {
+        console.log('sendOtp.fulfilled'); // Add logging
         state.loading = false;
-        state.user = action.payload;
       })
-      .addCase(fetchUser.rejected, (state, action) => {
+      .addCase(sendOtp.rejected, (state, action) => {
+        console.log('sendOtp.rejected', action.payload); // Add logging
         state.loading = false;
         state.error = action.payload;
       })
@@ -148,20 +191,6 @@ const authSlice = createSlice({
         state.error = action.payload;
       })
 
-      // Send OTP
-      .addCase(sendOtp.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(sendOtp.fulfilled, (state, action) => {
-        state.loading = false;
-        // Handle any response needed in UI
-      })
-      .addCase(sendOtp.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-
       // Login User
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
@@ -174,9 +203,30 @@ const authSlice = createSlice({
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      // Fetch User Profile
+      .addCase(fetchUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(fetchUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Logout User
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.user = null;
+        state.error = null; // Clear any previous errors
       });
   },
 });
 
-export const { logout, clearError } = authSlice.actions;
+// Export Actions and Reducer
+export const { clearError, setUser } = authSlice.actions;
 export default authSlice.reducer;

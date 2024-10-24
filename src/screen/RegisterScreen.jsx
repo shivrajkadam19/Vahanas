@@ -1,12 +1,22 @@
 import React, { useState, useRef } from 'react';
 import {
-  View, Text, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform,
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
+  Keyboard,
+  ActivityIndicator,
 } from 'react-native';
 import tw from 'twrnc';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CustomBottomSheet from '../components/CustomBottomSheet';
 import { TextInput, RadioButton } from 'react-native-paper';
+import { useDispatch } from 'react-redux';
+import { sendOtp } from '../redux/authSlice';
 
 const RegisterScreen = ({ navigation }) => {
   const [fullName, setFullName] = useState('');
@@ -15,10 +25,68 @@ const RegisterScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [gender, setGender] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const bottomSheetRef = useRef(null);
+  const dispatch = useDispatch();
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
+
+  const isValidEmail = (email) =>
+    /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email);
+
+  const isValidPhoneNumber = (number) => /^\d{10}$/.test(number);
+
+  const handleSendOtp = async () => {
+    try {
+      Keyboard.dismiss();
+
+      if (
+        !fullName.trim() ||
+        !email.trim() ||
+        !phoneNumber.trim() ||
+        !password.trim() ||
+        !gender
+      ) {
+        Alert.alert('Validation Error', 'All fields are required.');
+        return;
+      }
+
+      if (!isValidEmail(email)) {
+        Alert.alert('Invalid Email', 'Please enter a valid email address.');
+        return;
+      }
+
+      if (!isValidPhoneNumber(phoneNumber)) {
+        Alert.alert(
+          'Invalid Phone Number',
+          'Please enter a valid 10-digit phone number.'
+        );
+        return;
+      }
+
+      const formData = {
+        userName: fullName.trim(),
+        email: email.trim(),
+        phoneNo: phoneNumber.trim(),
+        password: password.trim(),
+        gender,
+      };
+
+      setLoading(true);
+
+      await dispatch(sendOtp({ email, phoneNumber, formData })).unwrap();
+      console.log('OTP sent successfully');
+
+      // Navigate to the OTP screen, passing formData as a parameter
+      navigation.navigate('OtpScreen', { formData });
+    } catch (error) {
+      console.error('OTP sending failed:', error);
+      Alert.alert('Error', error.message || 'Failed to send OTP.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -26,27 +94,29 @@ const RegisterScreen = ({ navigation }) => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={tw`flex-1 bg-white`}>
-        {/* Header Section */}
         <View style={tw`bg-white h-24 p-6`}>
           <View style={tw`flex-row items-center`}>
-            <TouchableOpacity onPress={() => navigation.goBack()} style={tw`mr-4`}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={tw`mr-4`}
+            >
               <FontAwesome name="arrow-left" size={24} color="black" />
             </TouchableOpacity>
             <Text style={tw`text-black text-xl font-semibold`}>Sign Up</Text>
           </View>
         </View>
 
-        {/* Lower Purple Section */}
         <View style={tw`bg-purple-600 h-36 p-6 rounded-t-3xl -mt-6`}>
           <Text style={tw`text-white text-center mt-4 text-lg`}>
-            Sign Up to access all the features in Barber Shop
+            Sign up to access all the features in Barber Shop
           </Text>
         </View>
 
-        {/* Form Section */}
         <View style={tw`bg-white p-6 -mt-6 rounded-t-3xl rounded-b-3xl`}>
-          <ScrollView contentContainerStyle={tw`flex-grow`} keyboardShouldPersistTaps="handled">
-            {/* Full Name Input */}
+          <ScrollView
+            contentContainerStyle={tw`flex-grow`}
+            keyboardShouldPersistTaps="handled"
+          >
             <TextInput
               label="Full Name"
               value={fullName}
@@ -57,7 +127,6 @@ const RegisterScreen = ({ navigation }) => {
               theme={{ colors: { primary: '#6200EE' } }}
             />
 
-            {/* Email Input */}
             <TextInput
               label="Email"
               value={email}
@@ -69,7 +138,6 @@ const RegisterScreen = ({ navigation }) => {
               theme={{ colors: { primary: '#6200EE' } }}
             />
 
-            {/* Phone Number Input */}
             <TextInput
               label="Phone Number"
               value={phoneNumber}
@@ -81,7 +149,6 @@ const RegisterScreen = ({ navigation }) => {
               theme={{ colors: { primary: '#6200EE' } }}
             />
 
-            {/* Password Input */}
             <TextInput
               label="Password"
               value={password}
@@ -105,7 +172,6 @@ const RegisterScreen = ({ navigation }) => {
               theme={{ colors: { primary: '#6200EE' } }}
             />
 
-            {/* Gender Selection */}
             <TouchableOpacity
               style={tw`border border-gray-300 p-4 rounded-lg mb-4`}
               onPress={() => bottomSheetRef.current?.open()}
@@ -113,15 +179,20 @@ const RegisterScreen = ({ navigation }) => {
               <Text style={tw`text-gray-600`}>{gender || 'Select Gender'}</Text>
             </TouchableOpacity>
 
-            {/* Sign Up Button */}
             <TouchableOpacity
               style={tw`mt-6 py-3 bg-purple-600 rounded-full items-center`}
-              onPress={() => navigation.navigate('OtpScreen')}
+              onPress={handleSendOtp}
+              disabled={loading}
             >
-              <Text style={tw`text-white text-lg font-semibold`}>Send OTP</Text>
+              {loading ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <Text style={tw`text-white text-lg font-semibold`}>
+                  Send OTP
+                </Text>
+              )}
             </TouchableOpacity>
 
-            {/* Footer Section */}
             <View style={tw`flex-row justify-center mt-6`}>
               <Text style={tw`text-gray-500`}>Already have an account? </Text>
               <TouchableOpacity onPress={() => navigation.navigate('Login')}>
@@ -132,14 +203,13 @@ const RegisterScreen = ({ navigation }) => {
         </View>
       </View>
 
-      {/* Custom Bottom Sheet for Gender Selection */}
       <CustomBottomSheet ref={bottomSheetRef} snapPoints={['45%']}>
         <View style={tw`p-6 bg-white rounded-t-3xl`}>
           <Text style={tw`text-lg font-semibold mb-4 text-center text-gray-800`}>
             Select Gender
           </Text>
 
-          <RadioButton.Group onValueChange={value => setGender(value)} value={gender}>
+          <RadioButton.Group onValueChange={setGender} value={gender}>
             <TouchableOpacity
               style={tw`flex-row items-center justify-between py-3 px-4 border-b border-gray-200`}
               onPress={() => setGender('Male')}
