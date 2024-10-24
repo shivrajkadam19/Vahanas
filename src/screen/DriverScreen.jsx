@@ -1,10 +1,19 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, Alert, PermissionsAndroid, Platform } from 'react-native';
+import { 
+  View, 
+  Text, 
+  Alert, 
+  Button, 
+  PermissionsAndroid, 
+  Platform, 
+  StyleSheet 
+} from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import { databaseInstance } from './firebaseConfig.js';
-import { ref, set } from '@react-native-firebase/database';
+import { ref, set, remove } from '@react-native-firebase/database';
+import * as Keychain from 'react-native-keychain'; // For handling logout
 
-const DriverScreen = () => {
+const DriverScreen = ({ navigation }) => {
   const [location, setLocation] = useState(null);
   const [driverExists, setDriverExists] = useState(true); // Track driver existence
   const watchId = useRef(null); // Track the Geolocation watcher ID
@@ -74,11 +83,36 @@ const DriverScreen = () => {
     );
   };
 
-  // Stop Location Updates when component unmounts
+  // Stop Location Updates
   const stopLocationUpdates = () => {
     if (watchId.current !== null) {
       Geolocation.clearWatch(watchId.current);
       console.log('Stopped location updates.');
+    }
+  };
+
+  // Logout Driver
+  const handleLogout = async () => {
+    try {
+      stopLocationUpdates(); // Stop location tracking
+
+      // Remove driver's location from Firebase
+      const locationRef = ref(databaseInstance, '/busLocation');
+      await remove(locationRef);
+      console.log('Driver location removed from Firebase.');
+
+      // Clear token from Keychain (or handle logout)
+      await Keychain.resetGenericPassword();
+      console.log('Driver logged out.');
+
+      // Navigate to login or onboarding screen
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }], // Adjust as needed for your app flow
+      });
+    } catch (error) {
+      console.error('Logout Error:', error);
+      Alert.alert('Logout Error', 'Unable to log out. Please try again.');
     }
   };
 
@@ -89,13 +123,27 @@ const DriverScreen = () => {
   }, [driverExists]); // Track driver existence in the dependency array
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>
+    <View style={styles.container}>
+      <Text style={styles.text}>
         Driver's Location:{' '}
         {location ? `${location.latitude}, ${location.longitude}` : 'Loading...'}
       </Text>
+      <Button title="Logout" onPress={handleLogout} color="#ff0000" />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  text: {
+    fontSize: 18,
+    marginBottom: 20,
+  },
+});
 
 export default DriverScreen;

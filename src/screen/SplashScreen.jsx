@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import LottieView from 'lottie-react-native';
 import * as Keychain from 'react-native-keychain'; // Import Keychain to retrieve token
 
@@ -8,19 +8,21 @@ const SplashScreen = ({ navigation }) => {
     const checkUserLoggedIn = async () => {
       try {
         const credentials = await Keychain.getGenericPassword(); // Check if token exists
-        if (credentials) {
-          console.log('User is logged in, navigating to Main screen.');
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'Login' }], // Navigate to Login/Main screen
-          });
-        } else {
-          console.log('No user found, navigating to Onboarding.');
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'Onboarding' }], // Navigate to Onboarding screen
-          });
-        }
+        setTimeout(() => {
+          if (credentials) {
+            console.log('User is logged in, navigating to Main screen.');
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Login' }], // Navigate to Login/Main screen
+            });
+          } else {
+            console.log('No user found, navigating to Onboarding.');
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Onboarding' }], // Navigate to Onboarding screen
+            });
+          }
+        }, 3000); // Ensure the splash screen runs for at least 3 seconds
       } catch (error) {
         console.error('Error checking user token:', error);
         Alert.alert('Error', 'An error occurred while checking login status.');
@@ -31,7 +33,7 @@ const SplashScreen = ({ navigation }) => {
       }
     };
 
-    // Start checking if user is logged in
+    // Start checking if the user is logged in
     checkUserLoggedIn();
   }, [navigation]);
 
