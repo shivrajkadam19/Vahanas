@@ -1763,6 +1763,13 @@
     firebase "10.13.2"
     superstruct "^0.6.2"
 
+"@react-native-firebase/auth@^21.2.0":
+  version "21.2.0"
+  resolved "https://registry.npmjs.org/@react-native-firebase/auth/-/auth-21.2.0.tgz"
+  integrity sha512-dC9EwXZTk+DPL0OGv9JsZnrsiG+V0xfPozYigwlvdWtevVd2bCbHDbZd4TFDuV+AtM1AIxWKAflUw0kLIcBDew==
+  dependencies:
+    plist "^3.1.0"
+
 "@react-native-firebase/database@^21.2.0":
   version "21.2.0"
   resolved "https://registry.npmjs.org/@react-native-firebase/database/-/database-21.2.0.tgz"
@@ -2233,6 +2240,11 @@
 
 "@ungap/structured-clone@^1.2.0":
   version "1.2.0"
+
+"@xmldom/xmldom@^0.8.8":
+  version "0.8.10"
+  resolved "https://registry.npmjs.org/@xmldom/xmldom/-/xmldom-0.8.10.tgz"
+  integrity sha512-2WALfTl4xo2SkGCYRt6rDTFfk9R1czmBvUQy12gK2KuRKIpWEhcbbzy8EZXtz/jkRqHX8bFEc6FC1HjX4TUWYw==
 
 abort-controller@^3.0.0:
   version "3.0.0"
@@ -5370,6 +5382,15 @@ pkg-dir@^4.2.0:
   dependencies:
     find-up "^4.0.0"
 
+plist@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.npmjs.org/plist/-/plist-3.1.0.tgz"
+  integrity sha512-uysumyrvkUX0rX/dEVqt8gC3sTBzd4zoWfLeS29nb53imdaXVvLINYXTI2GNqzaMuvacNx4uJQ8+b3zXR0pkgQ==
+  dependencies:
+    "@xmldom/xmldom" "^0.8.8"
+    base64-js "^1.5.1"
+    xmlbuilder "^15.1.1"
+
 possible-typed-array-names@^1.0.0:
   version "1.0.0"
 
@@ -5586,6 +5607,11 @@ react-native-app-intro-slider@^4.0.4:
   resolved "https://registry.npmjs.org/react-native-app-intro-slider/-/react-native-app-intro-slider-4.0.4.tgz"
   integrity sha512-Zkjaol6X3BbZkHUpVDj2LjdidpS6rCgKi0fx80xgGKa0pHxBRd4swWTv2bHnnvu5k1/HXwYk0mY2TbK+2jHl5w==
 
+react-native-geolocation-service@^5.3.1:
+  version "5.3.1"
+  resolved "https://registry.npmjs.org/react-native-geolocation-service/-/react-native-geolocation-service-5.3.1.tgz"
+  integrity sha512-LTXPtPNmrdhx+yeWG47sAaCgQc3nG1z+HLLHlhK/5YfOgfLcAb9HAkhREPjQKPZOUx8pKZMIpdGFUGfJYtimXQ==
+
 react-native-gesture-handler@*, react-native-gesture-handler@^2.20.0, react-native-gesture-handler@>=1.10.1, react-native-gesture-handler@>=2.5.0:
   version "2.20.0"
   resolved "https://registry.npmjs.org/react-native-gesture-handler/-/react-native-gesture-handler-2.20.0.tgz"
@@ -5644,6 +5670,11 @@ react-native-paper@^5.12.5:
     "@callstack/react-theme-provider" "^3.0.9"
     color "^3.1.2"
     use-latest-callback "^0.1.5"
+
+react-native-permissions@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.npmjs.org/react-native-permissions/-/react-native-permissions-5.0.1.tgz"
+  integrity sha512-bNeLSlfyHoAh1SHAvg8U88Dz96hkZ/vHXkhkGuHluTrvITTZ1EQ2gULZqU2R3YAfF7CudkL9LdbHf7HjHPAMsg==
 
 react-native-reanimated@*, react-native-reanimated@^3.15.5, react-native-reanimated@>=2.0.0, react-native-reanimated@>=2.2.0:
   version "3.15.5"
@@ -5730,7 +5761,7 @@ react-native-vector-icons@*, react-native-vector-icons@^10.2.0:
     prop-types "^15.7.2"
     yargs "^16.1.1"
 
-react-native@*, "react-native@^0.0.0-0 || >=0.60 <1.0", "react-native@^0.0.0-0 || >=0.65 <1.0", "react-native@>= 0.46", "react-native@>= 0.64.3", react-native@>=0.40.0, react-native@>=0.46, react-native@>=0.59.0, react-native@>=0.61.3, react-native@>=0.62.2, react-native@>=0.64.1, react-native@0.75.4:
+react-native@*, "react-native@^0.0.0-0 || >=0.60 <1.0", "react-native@^0.0.0-0 || >=0.65 <1.0", "react-native@>= 0.46", "react-native@>= 0.64.3", react-native@>=0.40.0, react-native@>=0.46, react-native@>=0.59.0, react-native@>=0.61.3, react-native@>=0.62.2, react-native@>=0.64.1, react-native@>=0.70.0, react-native@0.75.4:
   version "0.75.4"
   dependencies:
     "@jest/create-cache-key-function" "^29.6.3"
@@ -5797,7 +5828,7 @@ react-test-renderer@18.3.1:
     react-shallow-renderer "^16.15.0"
     scheduler "^0.23.2"
 
-react@*, "react@^16.0.0 || ^17.0.0 || ^18.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0", "react@^16.9.0 || ^17.0.0 || ^18", react@^18.0, react@^18.2.0, react@^18.3.1, "react@>= 17.0.1", react@>=16.11.0, react@>=16.3.0, react@>=16.8, react@>=17.0.0, react@>=17.0.1, react@18.3.1:
+react@*, "react@^16.0.0 || ^17.0.0 || ^18.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0", "react@^16.9.0 || ^17.0.0 || ^18", react@^18.0, react@^18.2.0, react@^18.3.1, "react@>= 17.0.1", react@>=16.11.0, react@>=16.3.0, react@>=16.8, react@>=17.0.0, react@>=17.0.1, react@>=18.1.0, react@18.3.1:
   version "18.3.1"
   dependencies:
     loose-envify "^1.1.0"
@@ -6866,6 +6897,11 @@ ws@^7:
 
 ws@^7.5.10:
   version "7.5.10"
+
+xmlbuilder@^15.1.1:
+  version "15.1.1"
+  resolved "https://registry.npmjs.org/xmlbuilder/-/xmlbuilder-15.1.1.tgz"
+  integrity sha512-yMqGBqtXyeN1e3TGYvgNgDVZ3j84W4cwkOXQswghol6APgZWaff9lnbvN7MHYJOiXsvGPXtjTYJEiC9J2wv9Eg==
 
 xtend@~4.0.1:
   version "4.0.2"

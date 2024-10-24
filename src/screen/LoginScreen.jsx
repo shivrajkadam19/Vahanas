@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, Alert, ActivityIndicator, Pressable } from 'react-native';
 import { TextInput, Switch } from 'react-native-paper';
 import tw from 'twrnc';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginUser, clearError } from '../redux/authSlice';  
-import * as Keychain from 'react-native-keychain';  // Import Keychain for secure storage
+import { loginUser, clearError } from '../redux/authSlice';
+import * as Keychain from 'react-native-keychain';
 
 const LoginScreen = ({ navigation }) => {
   const [emailOrPhone, setEmailOrPhone] = useState('');
@@ -17,9 +17,33 @@ const LoginScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const { user, error, loading } = useSelector((state) => state.auth);
 
-  // Handle login
+  // Track taps for the hidden page navigation
+  const tapCounter = useRef(0);
+  const timer = useRef(null);
+
+  const handleTripleTap = () => {
+    tapCounter.current += 1;
+    console.log(`Tap count: ${tapCounter.current}`); // Log current tap count
+
+    if (!timer.current) {
+      timer.current = setTimeout(() => {
+        console.log('Resetting tap counter'); // Log when counter resets
+        tapCounter.current = 0;
+        timer.current = null;
+      }, 500); // Adjust timeout for tap sensitivity
+    }
+
+    if (tapCounter.current === 3) {
+      console.log('Triple tap detected! Navigating to DriverLogin'); // Log when triple tap is detected
+      tapCounter.current = 0; // Reset counter
+      clearTimeout(timer.current);
+      timer.current = null;
+      navigation.navigate('DriverLogin'); // Navigate to Driver Login screen
+    }
+  };
+
+
   const handleLogin = async () => {
-    console.log('Attempting login with:', { emailOrPhone, password });
     if (!emailOrPhone || !password) {
       Alert.alert('Validation Error', 'Both fields are required.');
       return;
@@ -27,12 +51,10 @@ const LoginScreen = ({ navigation }) => {
 
     const response = await dispatch(loginUser({ email: emailOrPhone, password }));
     if (response.meta.requestStatus === 'fulfilled' && saveMe) {
-      // Store credentials securely if Save Me is enabled
       await Keychain.setGenericPassword(emailOrPhone, password);
     }
   };
 
-  // Fetch saved credentials on mount (if available)
   useEffect(() => {
     const loadCredentials = async () => {
       try {
@@ -49,14 +71,11 @@ const LoginScreen = ({ navigation }) => {
     loadCredentials();
   }, []);
 
-  // Handle user login success or error
   useEffect(() => {
     if (user) {
-      console.log('Login successful:', user);
       navigation.navigate('Main');
     }
     if (error) {
-      console.error('Login failed:', error);
       Alert.alert('Login Error', error, [{ text: 'OK', onPress: () => dispatch(clearError()) }]);
     }
   }, [user, error]);
@@ -75,11 +94,16 @@ const LoginScreen = ({ navigation }) => {
         </View>
       </View>
 
+      {/* Hidden Tap Area for Driver Login */}
+
+
       {/* Lower Purple Section */}
       <View style={tw`bg-purple-600 h-36 p-6 rounded-t-3xl -mt-6`}>
-        <Text style={tw`text-white text-center mt-4 text-lg`}>
-          Login to your account to access all the features in Bus Tracker
-        </Text>
+        <TouchableOpacity onPress={handleTripleTap} >
+          <Text style={tw`text-white text-center mt-4 text-lg`}>
+            Login to your account to access all the features in Bus Tracker
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {/* Form Section */}

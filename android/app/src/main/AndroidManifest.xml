@@ -1,7 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  
+  <!-- Required Permissions -->
   <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
   <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+  <!-- For Android 10+ (Background Location Permission) -->
+  <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
+  <!-- For Android 13+ (Notification permission required if background location is used in the future) -->
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
   <application
       android:name=".MainApplication"
@@ -11,14 +19,16 @@
       android:allowBackup="false"
       android:theme="@style/AppTheme"
       android:supportsRtl="true">
-      
+
+      <!-- Google Maps API Key -->
       <meta-data
           android:name="com.google.android.geo.API_KEY"
           android:value="AIzaSyDdyUi-67ydqERmMHRYMemxXci7hLUt5qg" />
 
+      <!-- Compatibility with legacy Apache HTTP (if needed) -->
       <uses-library
-      android:name="org.apache.http.legacy"
-      android:required="false" />
+          android:name="org.apache.http.legacy"
+          android:required="false" />
 
       <activity
           android:name=".MainActivity"

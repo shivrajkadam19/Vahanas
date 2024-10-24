@@ -50,7 +50,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
             : route.name;
 
         const isFocused = state.index === index;
-        const iconNames = ['home', 'user-cog']; // Customize icons based on index
+        const iconNames = ['home', 'user-cog','home']; // Customize icons based on index
         const iconName = iconNames[index];
 
         const onPress = () => {
