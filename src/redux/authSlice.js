@@ -122,7 +122,7 @@ export const fetchUser = createAsyncThunk(
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // console.log('User profile fetched:', response.data.user);
+      console.log('User profile fetched:', response.data.user);
       return response.data.user;
     } catch (error) {
       console.error('Fetch User Error:', error.response?.data || error.message);

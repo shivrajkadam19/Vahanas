@@ -1,26 +1,36 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Alert, Text } from 'react-native';
-import auth from '@react-native-firebase/auth'; // Firebase Auth
+import { View, Alert, ActivityIndicator, TouchableOpacity, Text } from 'react-native';
+import { TextInput } from 'react-native-paper';
+import tw from 'twrnc';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import Geolocation from 'react-native-geolocation-service';
-import { databaseInstance } from './firebaseConfig'; // Firebase Database
+import auth from '@react-native-firebase/auth';
+import { databaseInstance } from './firebaseConfig';
 
 const DriverLoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [driverId, setDriverId] = useState(null); // Track driver ID after login
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
-    try {
-      const result = await auth().signInWithEmailAndPassword(email, password);
-      setDriverId(result.user.uid); // Save the driver ID
-      Alert.alert('Login Successful', 'Location sharing started.');
+    if (!email || !password) {
+      Alert.alert('Validation Error', 'Both fields are required.');
+      return;
+    }
 
-      startSharingLocation(result.user.uid); // Start sharing location
-      // navigation.replace('Main'); // Navigate to Main User Area after login
-      console.log("success")
+    try {
+      setLoading(true);
+      const result = await auth().signInWithEmailAndPassword(email, password);
+      Alert.alert('Login Successful', 'Location sharing started.');
+      startSharingLocation(result.user.uid);
+      navigation.replace('Main'); // Navigate to main screen
     } catch (error) {
       console.error('Login Error:', error);
       Alert.alert('Login Failed', error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -29,32 +39,67 @@ const DriverLoginScreen = ({ navigation }) => {
       (position) => {
         const { latitude, longitude } = position.coords;
         const locationRef = databaseInstance.ref(`/drivers/${uid}/location`);
-        locationRef.set({ latitude, longitude }); // Store in Firebase
+        locationRef.set({ latitude, longitude });
       },
-      (error) => {
-        console.error('Location Error:', error);
-      },
+      (error) => console.error('Location Error:', error),
       { enableHighAccuracy: true, distanceFilter: 10 }
     );
   };
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
-      <Text style={{ fontSize: 24, textAlign: 'center', marginBottom: 20 }}>Driver Login</Text>
+    <View style={tw`flex-1 bg-white p-6`}>
+      <View style={tw`flex-row items-center mb-6`}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={tw`mr-4`}>
+          <FontAwesome name="arrow-left" size={24} color="black" />
+        </TouchableOpacity>
+        <Text style={tw`text-black text-xl font-semibold`}>Driver Login</Text>
+      </View>
+
       <TextInput
-        placeholder="Email"
+        label="Email"
         value={email}
         onChangeText={setEmail}
-        style={{ borderBottomWidth: 1, marginBottom: 10 }}
+        mode="outlined"
+        placeholder="Enter your email"
+        style={tw`mb-4`}
+        theme={{ colors: { primary: '#6200EE' } }}
       />
+
       <TextInput
-        placeholder="Password"
+        label="Password"
         value={password}
         onChangeText={setPassword}
-        secureTextEntry
-        style={{ borderBottomWidth: 1, marginBottom: 20 }}
+        mode="outlined"
+        secureTextEntry={!showPassword}
+        placeholder="Enter your password"
+        style={tw`mb-6`}
+        theme={{ colors: { primary: '#6200EE' } }}
+        right={
+          <TextInput.Icon
+            icon={() => (
+              <MaterialIcon
+                name={showPassword ? 'visibility-off' : 'visibility'}
+                size={24}
+                color="black"
+                onPress={togglePasswordVisibility}
+              />
+            )}
+          />
+        }
       />
-      <Button title="Login" onPress={handleLogin} />
+
+      <TouchableOpacity
+        style={tw`py-3 bg-purple-600 rounded-full items-center`}
+        onPress={handleLogin}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="white" />
+        ) : (
+          <Text style={tw`text-white text-lg font-semibold`}>Log In</Text>
+        )}
+      </TouchableOpacity>
     </View>
   );
 };

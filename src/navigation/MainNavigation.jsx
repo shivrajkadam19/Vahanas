@@ -23,6 +23,7 @@ const MainNavigator = () => {
     <Tab.Navigator
       screenOptions={{ headerShown: false }}
       tabBar={(props) => <CustomTabBar {...props} />}
+      tabBarHideOnKeyboard={true}
     >
       <Tab.Screen name="Home">
         {(props) => <ScreenWithAppBar {...props} component={HomeScreen} title="Home" />}
@@ -30,7 +31,7 @@ const MainNavigator = () => {
       <Tab.Screen name="Profile">
         {(props) => <ScreenWithAppBar {...props} component={SettingScreen} title="Profile" />}
       </Tab.Screen>
-      <Tab.Screen name="Driver">
+      <Tab.Screen name="Driver" >
         {(props) => <ScreenWithAppBar {...props} component={DriverScreen} title="Driver" />}
       </Tab.Screen>
     </Tab.Navigator>
