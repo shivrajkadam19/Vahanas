@@ -108,7 +108,7 @@ const DriverScreen = ({ navigation }) => {
       // Navigate to login or onboarding screen
       navigation.reset({
         index: 0,
-        routes: [{ name: 'Login' }], // Adjust as needed for your app flow
+        routes: [{ name: 'Auth' }], // Adjust as needed for your app flow
       });
     } catch (error) {
       console.error('Logout Error:', error);
