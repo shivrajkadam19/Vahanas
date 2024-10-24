@@ -1,12 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import * as Keychain from 'react-native-keychain';
-
+import {SEND_OTP_API,LOGIN_API,SIGNUP_API,PROFILE_API} from './api';
 // API Endpoints
-const SEND_OTP_API = 'https://vb-7o1p.onrender.com/api/v1/auth/sendotp';
-const LOGIN_API = 'https://vb-7o1p.onrender.com/api/v1/auth/login';
-const SIGNUP_API = 'https://vb-7o1p.onrender.com/api/v1/auth/signup';
-const PROFILE_API = 'https://vb-7o1p.onrender.com/api/v1/auth/profile';
+
 
 // Initial State
 const initialState = {
