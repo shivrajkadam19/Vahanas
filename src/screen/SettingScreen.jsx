@@ -133,7 +133,7 @@ const SettingScreen = () => {
             onRequestClose={() => setImageViewVisible(false)}
           />
 
-          <Text style={tw`text-black text-xl mt-4`}>{user?.name || 'Rutuja Ghongade'}</Text>
+          <Text style={tw`text-black text-xl mt-4`}>{user?.userName}</Text>
         </View>
 
         <ScrollView style={tw`flex-1 bg-white mb-15`}>

@@ -91,7 +91,7 @@ const DriverLoginScreen = ({ navigation }) => {
 
       <TouchableOpacity
         style={tw`py-3 bg-purple-600 rounded-full items-center`}
-        onPress={handleLogin}
+        onPress={navigation.navigate('DriverScreen')}
         disabled={loading}
       >
         {loading ? (

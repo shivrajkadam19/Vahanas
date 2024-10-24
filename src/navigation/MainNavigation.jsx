@@ -31,9 +31,9 @@ const MainNavigator = () => {
       <Tab.Screen name="Profile">
         {(props) => <ScreenWithAppBar {...props} component={SettingScreen} title="Profile" />}
       </Tab.Screen>
-      <Tab.Screen name="Driver" >
+      {/* <Tab.Screen name="Driver" >
         {(props) => <ScreenWithAppBar {...props} component={DriverScreen} title="Driver" />}
-      </Tab.Screen>
+      </Tab.Screen> */}
     </Tab.Navigator>
   );
 };

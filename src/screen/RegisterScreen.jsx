@@ -6,7 +6,6 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Alert,
   Keyboard,
   ActivityIndicator,
 } from 'react-native';
@@ -14,7 +13,7 @@ import tw from 'twrnc';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CustomBottomSheet from '../components/CustomBottomSheet';
-import { TextInput, RadioButton } from 'react-native-paper';
+import { TextInput, RadioButton, Snackbar } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
 import { sendOtp } from '../redux/authSlice';
 
@@ -26,6 +25,8 @@ const RegisterScreen = ({ navigation }) => {
   const [gender, setGender] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [visible, setVisible] = useState(false); // Snackbar visibility
 
   const bottomSheetRef = useRef(null);
   const dispatch = useDispatch();
@@ -36,6 +37,11 @@ const RegisterScreen = ({ navigation }) => {
     /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email);
 
   const isValidPhoneNumber = (number) => /^\d{10}$/.test(number);
+
+  const showError = (message) => {
+    setErrorMessage(message);
+    setVisible(true); // Show Snackbar
+  };
 
   const handleSendOtp = async () => {
     try {
@@ -48,20 +54,17 @@ const RegisterScreen = ({ navigation }) => {
         !password.trim() ||
         !gender
       ) {
-        Alert.alert('Validation Error', 'All fields are required.');
+        showError('All fields are required.');
         return;
       }
 
       if (!isValidEmail(email)) {
-        Alert.alert('Invalid Email', 'Please enter a valid email address.');
+        showError('Please enter a valid email address.');
         return;
       }
 
       if (!isValidPhoneNumber(phoneNumber)) {
-        Alert.alert(
-          'Invalid Phone Number',
-          'Please enter a valid 10-digit phone number.'
-        );
+        showError('Please enter a valid 10-digit phone number.');
         return;
       }
 
@@ -78,11 +81,10 @@ const RegisterScreen = ({ navigation }) => {
       await dispatch(sendOtp({ email, phoneNumber, formData })).unwrap();
       console.log('OTP sent successfully');
 
-      // Navigate to the OTP screen, passing formData as a parameter
       navigation.navigate('OtpScreen', { formData });
     } catch (error) {
       console.error('OTP sending failed:', error);
-      Alert.alert('Error', error.message || 'Failed to send OTP.');
+      showError(error.message || 'Failed to send OTP.');
     } finally {
       setLoading(false);
     }
@@ -192,13 +194,6 @@ const RegisterScreen = ({ navigation }) => {
                 </Text>
               )}
             </TouchableOpacity>
-
-            <View style={tw`flex-row justify-center mt-6`}>
-              <Text style={tw`text-gray-500`}>Already have an account? </Text>
-              <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                <Text style={tw`text-purple-600 font-semibold`}>Log In</Text>
-              </TouchableOpacity>
-            </View>
           </ScrollView>
         </View>
       </View>
@@ -210,29 +205,16 @@ const RegisterScreen = ({ navigation }) => {
           </Text>
 
           <RadioButton.Group onValueChange={setGender} value={gender}>
-            <TouchableOpacity
-              style={tw`flex-row items-center justify-between py-3 px-4 border-b border-gray-200`}
-              onPress={() => setGender('Male')}
-            >
-              <Text style={tw`text-gray-700 text-lg`}>Male</Text>
-              <RadioButton value="Male" />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={tw`flex-row items-center justify-between py-3 px-4 border-b border-gray-200`}
-              onPress={() => setGender('Female')}
-            >
-              <Text style={tw`text-gray-700 text-lg`}>Female</Text>
-              <RadioButton value="Female" />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={tw`flex-row items-center justify-between py-3 px-4`}
-              onPress={() => setGender('Other')}
-            >
-              <Text style={tw`text-gray-700 text-lg`}>Other</Text>
-              <RadioButton value="Other" />
-            </TouchableOpacity>
+            {['Male', 'Female', 'Other'].map((option) => (
+              <TouchableOpacity
+                key={option}
+                style={tw`flex-row items-center justify-between py-3 px-4 border-b border-gray-200`}
+                onPress={() => setGender(option)}
+              >
+                <Text style={tw`text-gray-700 text-lg`}>{option}</Text>
+                <RadioButton value={option} />
+              </TouchableOpacity>
+            ))}
           </RadioButton.Group>
 
           <TouchableOpacity
@@ -243,6 +225,15 @@ const RegisterScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </CustomBottomSheet>
+
+      <Snackbar
+        visible={visible}
+        onDismiss={() => setVisible(false)}
+        duration={3000}
+        style={tw`bg-red-600`}
+      >
+        {errorMessage}
+      </Snackbar>
     </KeyboardAvoidingView>
   );
 };

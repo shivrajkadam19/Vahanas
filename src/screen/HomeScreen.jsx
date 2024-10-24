@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, Alert, PermissionsAndroid, Platform } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
-import MapViewDirections from 'react-native-maps-directions'; // Import Directions library
+import MapViewDirections from 'react-native-maps-directions'; // Directions library
 import { databaseInstance } from './firebaseConfig.js';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import tw from 'twrnc'; // Tailwind utility for styling
@@ -43,15 +43,8 @@ const HomeScreen = () => {
         const { latitude, longitude } = position.coords;
         setUserLocation({ latitude, longitude });
 
-        mapRef.current?.animateToRegion(
-          {
-            latitude,
-            longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          },
-          1000
-        );
+        // Do not focus on the user location, only update the marker
+        console.log('User location updated:', latitude, longitude);
       },
       (error) => {
         console.log('Location Error:', error);
@@ -71,6 +64,7 @@ const HomeScreen = () => {
         const { latitude, longitude } = data;
         setBusLocation({ latitude, longitude });
 
+        // Animate the camera to the bus location
         mapRef.current?.animateCamera(
           { center: { latitude, longitude }, zoom: 15 },
           { duration: 1000 }
@@ -83,12 +77,26 @@ const HomeScreen = () => {
     return () => locationRef.off('value', listener); // Cleanup on unmount
   }, []);
 
+  const focusRouteArea = () => {
+    const coordinates = [kathoraNaka, poteCollege]; // Route coordinates
+    mapRef.current?.fitToCoordinates(coordinates, {
+      edgePadding: { top: 50, right: 50, bottom: 50, left: 50 }, // Add padding around the route
+      animated: true,
+    });
+  };
+
+  // Focus the route when the map is ready
+  const onMapReady = () => {
+    focusRouteArea(); // Automatically focus the route area
+  };
+
   return (
     <View style={tw`flex-1`}>
       <MapView
         ref={mapRef}
         style={tw`flex-1`}
-        showsUserLocation={true}
+        showsUserLocation={true} // Show the user marker
+        onMapReady={onMapReady} // Focus route area when map loads
         initialRegion={{
           latitude: kathoraNaka.latitude,
           longitude: kathoraNaka.longitude,

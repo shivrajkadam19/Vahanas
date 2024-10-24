@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, Alert, PermissionsAndroid, Platform } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import { databaseInstance } from './firebaseConfig.js';
@@ -7,7 +7,9 @@ import { ref, set } from '@react-native-firebase/database';
 const DriverScreen = () => {
   const [location, setLocation] = useState(null);
   const [driverExists, setDriverExists] = useState(true); // Track driver existence
+  const watchId = useRef(null); // Track the Geolocation watcher ID
 
+  // Request Location Permissions
   const requestLocationPermission = async () => {
     try {
       const fineLocationGranted = await PermissionsAndroid.request(
@@ -24,7 +26,7 @@ const DriverScreen = () => {
 
           if (backgroundGranted === PermissionsAndroid.RESULTS.GRANTED) {
             console.log('Background location permission granted.');
-            updateLocation(); // Start location updates after permissions are granted
+            startLocationUpdates(); // Start tracking after permissions are granted
           } else {
             Alert.alert(
               'Background Permission Denied',
@@ -32,7 +34,7 @@ const DriverScreen = () => {
             );
           }
         } else {
-          updateLocation(); // For Android versions < 10
+          startLocationUpdates(); // For Android versions < 10
         }
       } else {
         Alert.alert(
@@ -45,35 +47,52 @@ const DriverScreen = () => {
     }
   };
 
-  const updateLocation = () => {
+  // Start Location Updates
+  const startLocationUpdates = () => {
     if (!driverExists) {
       Alert.alert('No Driver Found', 'The driver is not available currently.');
-      return; // Stop further updates if no driver exists
+      return; // Stop if no driver exists
     }
 
-    const latitude = 20.987798675355773; // Dastur Nagar, Amravati (Static demo coordinates)
-    const longitude = 77.75748610275781;
+    watchId.current = Geolocation.watchPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        const newLocation = { latitude, longitude };
+        setLocation(newLocation); // Update local state
 
-    const newLocation = { latitude, longitude };
-    setLocation(newLocation);
+        // Update location in Firebase
+        const locationRef = ref(databaseInstance, '/busLocation');
+        set(locationRef, newLocation)
+          .then(() => console.log('Location updated in Firebase'))
+          .catch((error) => console.error('Error updating location:', error));
+      },
+      (error) => {
+        console.error('Location Error:', error);
+        Alert.alert('Location Error', 'Unable to track your location.');
+      },
+      { enableHighAccuracy: true, distanceFilter: 10, interval: 5000, fastestInterval: 2000 } // Config options for location updates
+    );
+  };
 
-    const locationRef = ref(databaseInstance, '/busLocation');
-    set(locationRef, newLocation)
-      .then(() => console.log('Location updated in Firebase'))
-      .catch((error) => console.error('Error updating location:', error));
+  // Stop Location Updates when component unmounts
+  const stopLocationUpdates = () => {
+    if (watchId.current !== null) {
+      Geolocation.clearWatch(watchId.current);
+      console.log('Stopped location updates.');
+    }
   };
 
   useEffect(() => {
     requestLocationPermission(); // Request permission on mount
 
-    const intervalId = setInterval(updateLocation, 10000000); // Update location every 5 seconds
-    return () => clearInterval(intervalId); // Cleanup on unmount
+    return () => stopLocationUpdates(); // Cleanup on unmount
   }, [driverExists]); // Track driver existence in the dependency array
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <Text>
-        Driver's Location: {location ? `${location.latitude}, ${location.longitude}` : 'Loading...'}
+        Driver's Location:{' '}
+        {location ? `${location.latitude}, ${location.longitude}` : 'Loading...'}
       </Text>
     </View>
   );
