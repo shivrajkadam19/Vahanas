@@ -5,7 +5,7 @@ import Geolocation from 'react-native-geolocation-service';
 import MapViewDirections from 'react-native-maps-directions'; // Directions library
 import { databaseInstance } from './firebaseConfig.js';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import tw from 'twrnc'; // Tailwind utility for styling
+import tw from 'twrnc';
 
 const GOOGLE_MAPS_API_KEY = 'AIzaSyDdyUi-67ydqERmMHRYMemxXci7hLUt5qg'; // Replace with your API key
 
@@ -90,6 +90,12 @@ const HomeScreen = () => {
     focusRouteArea(); // Automatically focus the route area
   };
 
+  const stops = [
+    { name: 'Stop 3', latitude: 20.967, longitude: 77.757 },
+    { name: 'Stop 2', latitude: 20.975, longitude: 77.757 },
+    { name: 'Stop 1', latitude: 20.982, longitude: 77.757 },
+  ];
+
   return (
     <View style={tw`flex-1`}>
       <MapView
@@ -136,6 +142,17 @@ const HomeScreen = () => {
             </View>
           </Marker>
         )}
+
+        {/* Stops Markers */}
+        {stops.map((stop, index) => (
+          <Marker key={index} coordinate={{ latitude: stop.latitude, longitude: stop.longitude }}>
+            <View style={tw`items-center`}>
+              <Icon name="map-marker" size={30} color="#28a745" />
+              <Text style={tw`text-black font-bold mt-1`}>{stop.name}</Text>
+            </View>
+          </Marker>
+        ))}
+
       </MapView>
     </View>
   );
